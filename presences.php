@@ -74,10 +74,10 @@ $hasResults = false;
                     <td><?= $row['pre_date'] ?></td>
                     <td><?= $row['total_conso'] ?? 0 ?> €</td>
                     <td>
-                        <button class="btn btn-warning btn-sm" onclick="openModal(<?= $row['id'] ?>, '<?= $row['pre_prenom'] ?>', '<?= $row['pre_date'] ?>')">Modifier</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="openModal(<?= $row['id'] ?>, '<?= $row['pre_prenom'] ?>', '<?= $row['pre_date'] ?>')">Modifier</button>
                         <form action="backend/presence.php" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet enregistrement ?');">
                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                            <button type="submit" name="supprimer" class="btn btn-danger btn-sm">Supprimer</button>
+                            <button type="submit" name="supprimer" class="btn btn-outline-secondary btn-sm">Supprimer</button>
                         </form>
                         <form action="addition.php" method="post" class="d-inline">
                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
@@ -85,11 +85,11 @@ $hasResults = false;
                             <?php 
                             // controle si c'est paye ou pas
                             if ($row['pre_payment_status'] <> 'paid') : ?> 
-                            <button type="submit" name="consomation" class="btn btn-success btn-sm">Addition</button>
+                            <button type="submit" name="consomation" class="btn btn-danger btn-sm">Addition</button>
                             <?php endif; ?>
                             <?php 
                             if ($row['pre_payment_status'] == 'paid') : ?> 
-                            <button type="submit" name="consomation" class="btn btn-secondary btn-sm">Payé</button>
+                            <button type="submit" name="consomation" class="btn btn-success btn-sm">Payé</button>
                             <?php endif; ?>    
 
                         </form>

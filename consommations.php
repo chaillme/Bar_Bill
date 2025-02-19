@@ -1,13 +1,17 @@
 <?php
 require 'backend/db.php';
 
+$search = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_pre = $_POST['id'] ?? 0;
     $prenom = $_POST['prenom'] ?? 0;
+    $search = $_POST['search'] ?? '';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $id_pre = $_GET['id'] ?? 0;
+    $search = $_GET['search'] ?? '';
 }
 
 if ($id_pre > 0) {
@@ -24,7 +28,15 @@ include("header.php");
 ?>
 
 <div class="container mt-4">
-    <h1 class="text-center">Ajouter des consommations à<br> <b><?= $prenom ?></b></h1>
+    <h4 class="text-center">Ajouter à <b><?= $prenom ?></b></h4>
+    <!-- Champ de recherche -->
+    <div class="mb-3">
+        <form method="get" action="consommations.php">
+            <input type="hidden" name="id" value="<?= $id_pre ?>">
+            <input type="text" name="search" class="form-control" placeholder="Rechercher des articles..." value="<?= htmlspecialchars($search) ?>">
+            <button type="submit" class="btn btn-primary mt-2">Rechercher</button>
+        </form>
+    </div>
     <!-- Liste des articles -->
     
     <table class="table table-hover">
@@ -49,11 +61,13 @@ include("header.php");
             LEFT JOIN consommations ON articles.id = consommations.con_art_id 
                 AND consommations.con_pre_id = :id_pre
             LEFT JOIN presences ON presences.id = :id_pre
+            WHERE articles.art_nom LIKE :search
             GROUP BY articles.id, articles.art_nom, articles.art_prix, presences.id
             ORDER by articles.art_nom";
 
             $stmt = $db->prepare($query);
             $stmt->bindValue(':id_pre', $id_pre, SQLITE3_INTEGER);
+            $stmt->bindValue(':search', '%' . $search . '%', SQLITE3_TEXT);
             $result = $stmt->execute();
 
             $hasResults = false;
@@ -113,6 +127,6 @@ function openModal(id, prenom, date) {
     editModal.show();
 }
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

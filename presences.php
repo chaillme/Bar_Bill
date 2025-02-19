@@ -28,7 +28,7 @@ $hasResults = false;
 ?>
 
 <div class="container mt-4">
-    <h1 class="text-center">Gestion des présences</h1>
+    <!--<h4 class="text-center">Gestion des présences</h4> -->
 
     <!-- Formulaire de ajout presence 
     <div class="card p-3 mb-3">
@@ -41,15 +41,15 @@ $hasResults = false;
 
     <!-- Formulaire de recherche -->
     <div class="card p-3 mb-3">
-        <h3>Rechercher une presence</h3>
+       <!-- <h3>Rechercher une presence</h3> -->
         <form action="presences.php" method="get" class="d-flex align-items-center">
             <input type="text" name="search" class="form-control me-2" placeholder="Rechercher une presence" value="<?= $_GET['search'] ?? '' ?>">
             <button type="submit" class="btn btn-secondary">Rechercher</button>
         </form>
     </div>
 
-    <!-- Liste des presence -->
-    <h3>Liste des présences du jour</h3>
+    <!-- Liste des presence 
+    <h4>Liste des présences du jour</h4>-->
     <table class="table table-striped">
         <thead>
             <tr>
@@ -138,6 +138,7 @@ function openModal(id, prenom, date) {
     editModal.show();
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -31,10 +31,9 @@ include("header.php");
     <h4 class="text-center">Ajouter à <b><?= $prenom ?></b></h4>
     <!-- Champ de recherche -->
     <div class="mb-3">
-        <form method="get" action="consommations.php">
+        <form id="searchForm">
             <input type="hidden" name="id" value="<?= $id_pre ?>">
-            <input type="text" name="search" class="form-control" placeholder="Rechercher des articles..." value="<?= htmlspecialchars($search) ?>">
-            <button type="submit" class="btn btn-primary mt-2">Rechercher</button>
+            <input type="text" id="searchInput" name="search" class="form-control" placeholder="Rechercher des articles..." value="<?= htmlspecialchars($search) ?>">
         </form>
     </div>
     <!-- Liste des articles -->
@@ -50,7 +49,7 @@ include("header.php");
                 <th>Retirer (-)</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="articlesTableBody">
             <?php
             $query = "SELECT 
                 articles.*, 
@@ -79,26 +78,14 @@ include("header.php");
                 ?>
                 <tr>
                     <td>
-                        <form action='backend/consommation.php' method='post' class='d-inline'>
-                            <input type='hidden' name='art_id' value='<?= $row['id'] ?>'>
-                            <input type='hidden' name='pre_id' value='<?= $id_pre ?>'>
-                            <input type='hidden' name='con_qty' value=1>
-                            <input type='hidden' name='art_prix' value='<?= $row['art_prix'] ?>'>
-                            <button type='submit' name='add' class='btn btn-success btn-sm'>+</button>
-                        </form>
+                        <button type='button' class='btn btn-success btn-sm add-btn' data-art-id='<?= $row['id'] ?>' data-pre-id='<?= $id_pre ?>' data-art-prix='<?= $row['art_prix'] ?>'>+</button>
                     </td>
                     <td><?= $row['art_nom'] ?></td>
                     <td><b><?= $row['con_qty'] ?></b></td>
                     <td><?= $row['art_prix'] ?></td>
                     <td><?= $totalqty ?></td>
                     <td>
-                        <form action='backend/consommation.php' method='post' class='d-inline'>
-                            <input type='hidden' name='art_id' value='<?= $row['id'] ?>'>
-                            <input type='hidden' name='pre_id' value='<?= $id_pre ?>'>
-                            <input type='hidden' name='con_qty' value=1>
-                            <input type='hidden' name='art_prix' value='<?= $row['art_prix'] ?>'>
-                            <button type='submit' name='supprimer' class='btn btn-danger btn-sm'>-</button>
-                        </form>
+                        <button type='button' class='btn btn-danger btn-sm remove-btn' data-art-id='<?= $row['id'] ?>' data-pre-id='<?= $id_pre ?>' data-art-prix='<?= $row['art_prix'] ?>'>-</button>
                     </td>
                 </tr>
                 <?php
@@ -118,15 +105,72 @@ include("header.php");
 </div>
 
 <script>
-function openModal(id, prenom, date) {
-    document.getElementById("editId").value = id;
-    document.getElementById("editPreNom").value = prenom;
-    // Add date handling if needed
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('searchInput').addEventListener('input', function() {
+        var searchInput = document.getElementById('searchInput').value;
+        var idPre = <?= $id_pre ?>;
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'consommations.php?id=' + idPre + '&search=' + encodeURIComponent(searchInput), true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var parser = new DOMParser();
+                var doc = parser.parseFromString(xhr.responseText, 'text/html');
+                var newTableBody = doc.getElementById('articlesTableBody').innerHTML;
+                document.getElementById('articlesTableBody').innerHTML = newTableBody;
+                attachEventListeners();
+            }
+        };
+        xhr.send();
+    });
 
-    var editModal = new bootstrap.Modal(document.getElementById("editModal"));
-    editModal.show();
-}
+    function attachEventListeners() {
+        document.querySelectorAll('.add-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var artId = this.getAttribute('data-art-id');
+                var preId = this.getAttribute('data-pre-id');
+                var artPrix = this.getAttribute('data-art-prix');
+                updateConsommation('add', artId, preId, artPrix);
+            });
+        });
+
+        document.querySelectorAll('.remove-btn').forEach(function(button) {
+            button.addEventListener('click', function() {
+                var artId = this.getAttribute('data-art-id');
+                var preId = this.getAttribute('data-pre-id');
+                var artPrix = this.getAttribute('data-art-prix');
+                updateConsommation('supprimer', artId, preId, artPrix);
+            });
+        });
+    }
+
+    function updateConsommation(action, artId, preId, artPrix) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'backend/consommation.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                var searchInput = document.getElementById('searchInput').value;
+                var idPre = <?= $id_pre ?>;
+                var xhrSearch = new XMLHttpRequest();
+                xhrSearch.open('GET', 'consommations.php?id=' + idPre + '&search=' + encodeURIComponent(searchInput), true);
+                xhrSearch.onreadystatechange = function() {
+                    if (xhrSearch.readyState === 4 && xhrSearch.status === 200) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(xhrSearch.responseText, 'text/html');
+                        var newTableBody = doc.getElementById('articlesTableBody').innerHTML;
+                        document.getElementById('articlesTableBody').innerHTML = newTableBody;
+                        attachEventListeners();
+                    }
+                };
+                xhrSearch.send();
+            }
+        };
+        xhr.send('art_id=' + artId + '&pre_id=' + preId + '&con_qty=1&art_prix=' + artPrix + '&' + action + '=true');
+    }
+
+    attachEventListeners();
+});
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -26,7 +26,7 @@ $hasResults = false;
     <!-- Formulaire de recherche -->
     <div class="card mb-3">
         <div class="card-body">
-            <form action="articles_list.php" method="get" class="mb-3">
+            <form action="articles_list.php" method="get" class="mb-3" autocomplete="off">
                 <input type="text" name="search" class="form-control" placeholder="Rechercher une boisson" value="<?= $_GET['search'] ?? '' ?>">
                 <button type="submit" class="btn btn-secondary mt-2">Rechercher</button>
             </form>

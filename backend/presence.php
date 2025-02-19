@@ -10,16 +10,23 @@ $db = new SQLite3('../database/database.sqlite');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'] ?? 0;
     $prenom = $_POST['prenom'] ?? '';
+    //$date = $_POST['date'] ?? '';
+
+
+echo $id;
+echo $prenom;
+//echo $date;    
+echo $_POST['modifier'];
    // $date = date('d-m-Y');
 
 
 
     if (isset($_POST['modifier'])) {
-        if ($id > 0 && !empty($nom) && $prix > 0) {
-            $stmt = $db->prepare("UPDATE presences SET pre_prenom = :pre_prenom, pre_date = :pre_date WHERE id = :id");
+        if ($id > 0 && !empty($prenom) ) {
+            $stmt = $db->prepare("UPDATE presences SET pre_prenom = :pre_prenom WHERE id = :id");
             $stmt->bindValue(':id', $id, SQLITE3_INTEGER);
             $stmt->bindValue(':pre_prenom', $prenom, SQLITE3_TEXT);
-            //$stmt->bindValue(':pre_date', $date, SQLITE3_FLOAT);
+           // $stmt->bindValue(':pre_date', $date, SQLITE3_FLOAT);
             
             $stmt->execute();
             echo "presence modifié avec succès.";

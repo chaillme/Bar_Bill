@@ -31,7 +31,7 @@ include("header.php");
     <h4 class="text-center">Ajouter à <b><?= $prenom ?></b></h4>
     <!-- Champ de recherche -->
     <div class="mb-3">
-        <form id="searchForm">
+        <form id="searchForm" autocomplete="off">
             <input type="hidden" name="id" value="<?= $id_pre ?>">
             <input type="text" id="searchInput" name="search" class="form-control" placeholder="Rechercher des articles..." value="<?= htmlspecialchars($search) ?>">
         </form>

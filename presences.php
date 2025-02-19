@@ -42,7 +42,7 @@ $hasResults = false;
     <!-- Formulaire de recherche -->
     <div class="card p-3 mb-3">
        <!-- <h3>Rechercher une presence</h3> -->
-        <form action="presences.php" method="get" class="d-flex align-items-center">
+        <form action="presences.php" method="get" class="d-flex align-items-center" autocomplete="off">
             <input type="text" name="search" class="form-control me-2" placeholder="Rechercher une presence" value="<?= $_GET['search'] ?? '' ?>">
             <button type="submit" class="btn btn-secondary">Rechercher</button>
         </form>
@@ -67,7 +67,7 @@ $hasResults = false;
                     <td>
                         <form action="consommations.php" method="get" class="d-inline">
                             <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                            <button type="submit" name="consomation" class="btn btn-success btn-sm">+</button>
+                            <button type="submit" name="consomation" class="btn btn-success btn-sm">Ajouter conso (+)</button>
                         </form>
                     </td>
                     <td><?= $row['pre_prenom'] ?></td>
@@ -121,6 +121,10 @@ $hasResults = false;
                         <label for="editPreNom" class="form-label">PreNom</label>
                         <input type="text" class="form-control" name="prenom" id="editPreNom" required>
                     </div>
+                    <div class="mb-3">
+                        <label for="editPreDate" class="form-label">Date</label>
+                        <input type="date" class="form-control" name="date" id="editPreDate" required>
+                    </div>
                     <button type="submit" name="modifier" class="btn btn-warning">Modifier</button>
                 </form>
             </div>
@@ -132,7 +136,7 @@ $hasResults = false;
 function openModal(id, prenom, date) {
     document.getElementById("editId").value = id;
     document.getElementById("editPreNom").value = prenom;
-    // Add date handling if needed
+    document.getElementById("editPreDate").value = date;
 
     var editModal = new bootstrap.Modal(document.getElementById("editModal"));
     editModal.show();

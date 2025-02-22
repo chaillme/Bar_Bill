@@ -1,10 +1,11 @@
 <?php
-include("header.php");
+include "header.php";
 
 require 'backend/db.php';
 
 // Obtenir la date du jour
 $date_du_jour = date('Y-m-d');
+$date_du_jour_eur = date('d-m-Y');
 
 $search = $_GET['search'] ?? '';
 $query = "SELECT presences.*, 
@@ -17,93 +18,91 @@ $query = "SELECT presences.*,
 if (!empty($search)) {
     $query .= " AND pre_prenom LIKE :search";
 }
+$query .= " order by pre_payment_status asc , pre_prenom asc";
 $stmt = $db->prepare($query);
 $stmt->bindValue(':date_du_jour', $date_du_jour, SQLITE3_TEXT);
 if (!empty($search)) {
     $stmt->bindValue(':search', '%' . $search . '%', SQLITE3_TEXT);
 }
+
+
 $result = $stmt->execute();
 
 $hasResults = false;
 ?>
 
 <div class="container mt-4">
-    <!--<h4 class="text-center">Gestion des présences</h4> -->
-
-    <!-- Formulaire de ajout presence 
+    <!-- Formulaire de recherche 
     <div class="card p-3 mb-3">
-        <h3>Ajouter une presence</h3>
-        <form action="backend/presence.php" method="post" enctype="multipart/form-data" class="d-flex align-items-center">
-            <input type="text" name="prenom" class="form-control me-2" placeholder="Prenom et nom" required>
-            <button type="submit" name="add" class="btn btn-success">Ajouter presence</button>
-        </form>
-    </div>-->
-
-    <!-- Formulaire de recherche -->
-    <div class="card p-3 mb-3">
-       <!-- <h3>Rechercher une presence</h3> -->
         <form action="presences.php" method="get" class="d-flex align-items-center" autocomplete="off">
             <input type="text" name="search" class="form-control me-2" placeholder="Rechercher une presence" value="<?= $_GET['search'] ?? '' ?>">
             <button type="submit" class="btn btn-secondary">Rechercher</button>
         </form>
-    </div>
+    </div>-->
 
-    <!-- Liste des presence 
-    <h4>Liste des présences du jour</h4>-->
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Consomation</th>
-                <th>Nom</th>
-                <th>Date</th>
-                <th>Total Consommé (€)</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php while ($row = $result->fetchArray(SQLITE3_ASSOC)) : ?>
+
+    <div class="card p-3 mb-3">
+        <form action="backend/presence.php" method="post" enctype="multipart/form-data"
+            class="d-flex align-items-center">
+            <input type="text" name="prenom" class="form-control me-2" placeholder="Pour ajouter une présence inscriver le Prenom" required>
+
+
+            <button type="submit" name="add" class="btn btn-success w-25"">Ajouter presence</button>
+    </form>
+        </div>
+
+
+
+    <!-- Liste des présences sous forme de tuiles -->
+    <div class=" row">
+                <?php while ($row = $result->fetchArray(SQLITE3_ASSOC)) : ?>
                 <?php $hasResults = true; ?>
-                <tr>
-                    <td>
-                        <form action="consommations.php" method="get" class="d-inline">
-                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                            <button type="submit" name="consomation" class="btn btn-success btn-sm">Ajouter conso (+)</button>
-                        </form>
-                    </td>
-                    <td><?= $row['pre_prenom'] ?></td>
-                    <td><?= $row['pre_date'] ?></td>
-                    <td><?= $row['total_conso'] ?? 0 ?> €</td>
-                    <td>
-                        <button class="btn btn-outline-secondary btn-sm" onclick="openModal(<?= $row['id'] ?>, '<?= $row['pre_prenom'] ?>', '<?= $row['pre_date'] ?>')">Modifier</button>
-                        <form action="backend/presence.php" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet enregistrement ?');">
-                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                            <button type="submit" name="supprimer" class="btn btn-outline-secondary btn-sm">Supprimer</button>
-                        </form>
-                        <form action="addition.php" method="post" class="d-inline">
-                            <input type="hidden" name="id" value="<?= $row['id'] ?>">
-                           
-                            <?php 
-                            // controle si c'est paye ou pas
-                            if ($row['pre_payment_status'] <> 'paid') : ?> 
-                            <button type="submit" name="consomation" class="btn btn-danger btn-sm">Addition</button>
-                            <?php endif; ?>
-                            <?php 
-                            if ($row['pre_payment_status'] == 'paid') : ?> 
-                            <button type="submit" name="consomation" class="btn btn-success btn-sm">Payé</button>
-                            <?php endif; ?>    
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <div class="card-body" >
+                            <h5 class="card-title"><?= $row['pre_prenom'] ?></h5>
+                            <!--<p class="card-text">Date: <?= $row['pre_date'] ?></p>-->
+                            <p class="card-text">Total Consommé: <?= $row['total_conso'] ?? 0 ?> €</p>
+                            <div class="d-flex justify-content-between">
 
-                        </form>
-                    </td>
-                </tr>
-            <?php endwhile; ?>
+                                <form action="consommations.php" method="get" class="d-inline">
+                                    <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                    <button type="submit" name="consomation" class="btn btn-success btn-sm">Conso
+                                        (+)</button>
+                                </form>
+                                <div class="btn-group">
+                                    <button class="btn btn-outline-secondary btn-sm"
+                                        onclick="openModal(<?= $row['id'] ?>, '<?= $row['pre_prenom'] ?>', '<?= $row['pre_date'] ?>')">Modifier</button>
+                                    <form action="backend/presence.php" method="post" class="d-inline"
+                                        onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet enregistrement ?');">
+                                        <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                        <button type="submit" name="supprimer"
+                                            class="btn btn-outline-secondary btn-sm">Supprimer</button>
+                                    </form>
+                                </div>
+                                <form action="addition.php" method="post" class="d-inline">
+                                    <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                    <?php if ($row['pre_payment_status'] <> 'paid') : ?>
+                                    <button type="submit" name="consomation"
+                                        class="btn btn-danger btn-sm">Addition (=)</button>
+                                    <?php endif; ?>
+                                    <?php if ($row['pre_payment_status'] == 'paid') : ?>
+                                    <button type="submit" name="consomation"
+                                        class="btn btn-success btn-sm">Payé</button>
+                                    <?php endif; ?>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endwhile; ?>
 
-            <?php if (!$hasResults) : ?>
-                <tr>
-                    <td colspan="5" class="text-center">Aucun enregistrement trouvé</td>
-                </tr>
-            <?php endif; ?>
-        </tbody>
-    </table>
+                <?php if (!$hasResults) : ?>
+                <div class="col-12 text-center">
+                    <p>Aucune présence aujourd'hui (<?= $date_du_jour_eur; ?>)</p>
+                </div>
+                <?php endif; ?>
+    </div>
 </div>
 
 <!-- Modal de modification -->
@@ -141,8 +140,11 @@ function openModal(id, prenom, date) {
     var editModal = new bootstrap.Modal(document.getElementById("editModal"));
     editModal.show();
 }
+
+
 </script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> -->
 
 </body>
+
 </html>

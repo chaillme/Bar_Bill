@@ -19,15 +19,17 @@
 
     <div class="container mt-4">
         <div class="row">
-            <div class="col">
+            <!-- <div class="col">
             <a class="navbar-brand" href="#">Bar manager</a>
-            </div>
+            </div> -->
             <div class="col">
-                <a href="presences.php" class="btn btn-primary mb-3">Home</a>
+                <a href="presences.php" class="btn btn-primary mb-3">Présences</a>
             </div>
+             <!--
             <div class="col">
                 <a href="presences_add.php" class="btn btn-primary mb-3">Ajouter une présence</a>
             </div>
+            -->
             <div class="col">
                 <a href="articles_list.php" class="btn btn-primary mb-3">Gestion des Articles</a>
             </div>
